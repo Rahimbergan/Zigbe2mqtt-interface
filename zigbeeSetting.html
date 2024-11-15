@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zigbee Device Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            width: 450px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .container:hover {
+            transform: translateY(-10px);
+        }
+        h1 {
+            color: #0072ff;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .active-devices {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+        .device {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.3s;
+            position: relative;
+        }
+        .device:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        button {
+            background: #0072ff;
+            border: none;
+            padding: 12px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: #005bb5;
+            transform: scale(1.05);
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            color: #0072ff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.2s;
+        }
+        .icon-button:hover {
+            color: #005bb5;
+            transform: scale(1.2);
+        }
+        .edit-button {
+            margin-left: 10px;
+            background: none;
+            border: none;
+            color: #0072ff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.2s;
+        }
+        .edit-button:hover {
+            color: #005bb5;
+            transform: scale(1.2);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #0072ff;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Zigbee Device Connection</h1>
+        <div class="active-devices" id="active-devices">
+            <!-- Active and inactive devices will be displayed here based on backend response -->
+            <script>
+                const devices = [];
+                for (let i = 1; i <= 100; i++) {
+                    devices.push({ id: i, name: `Device ${i}`, status: i % 2 === 0 ? 'inactive' : 'active' });
+                }
+
+                const activeDevicesContainer = document.getElementById('active-devices');
+                devices.forEach(device => {
+                    const deviceElement = document.createElement('div');
+                    deviceElement.classList.add('device');
+                    deviceElement.innerHTML = `
+                        <button class="icon-button" onclick="${device.status === 'active' ? `disconnectDevice(${device.id})` : `connectDevice(${device.id})`}">
+                            <i class="${device.status === 'active' ? 'fas fa-unlink' : 'fas fa-link'}"></i>
+                        </button>
+                        <span>${device.name} (${device.status === 'active' ? 'Active' : 'Inactive'})</span>
+                        <div class="device-actions">
+                            <button class="edit-button" onclick="window.location.href='edit.html'">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="icon-button" onclick="deleteDevice(${device.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    activeDevicesContainer.appendChild(deviceElement);
+                });
+            </script>
+        </div>
+        <div class="button-container">
+            <button onclick="window.location.href='main.html'">Main Menu</button>
+            <label class="switch">
+                <input type="checkbox" id="permit-join">
+                <span class="slider"></span>
+            </label>
+            <span>Permit Join</span>
+        </div>
+    </div>
+
+    <script>
+        function connectDevice(deviceId) {
+            // Logic to connect the device
+            alert('Connecting device ' + deviceId);
+        }
+
+        function disconnectDevice(deviceId) {
+            // Logic to disconnect the device
+            alert('Disconnecting device ' + deviceId);
+        }
+
+        function deleteDevice(deviceId) {
+            // Logic to delete the device
+            alert('Deleting device ' + deviceId);
+        }
+
+        function editDevice(deviceId) {
+            // Logic to edit the device
+            alert('Editing device ' + deviceId);
+        }
+    </script>
+</body>
+</html>
