@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Zigbee Device</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Simplified styles */
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to right, #ff9966, #ff5e62);
+            background: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,46 +17,134 @@
         }
         .container {
             background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-            padding: 40px;
-            width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 400px;
             text-align: center;
-            transition: transform 0.3s;
-        }
-        .container:hover {
-            transform: translateY(-10px);
         }
         h1 {
-            color: #ff5e62;
-            font-size: 28px;
-            margin-bottom: 30px;
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 15px;
         }
         .info {
             text-align: left;
-            margin-bottom: 20px;
-            padding: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
             border: 1px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 5px;
             background: #f9f9f9;
+            font-size: 14px;
         }
         .button-container {
             margin-top: 20px;
         }
         button {
-            background: #ff5e62;
+            background: #007bff;
             border: none;
-            padding: 12px 25px;
+            padding: 8px 16px;
             color: white;
-            font-weight: bold;
             cursor: pointer;
-            border-radius: 25px;
-            font-size: 16px;
-            transition: background 0.3s, transform 0.2s;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
         }
         button:hover {
-            background: #e14d50;
-            transform: scale(1.05);
+            background: #0056b3;
+        }
+        .event-container {
+            margin-bottom: 15px;
+        }
+        .event-count {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .event-label-input {
+            padding: 5px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            width: 80px;
+        }
+        .selection-buttons {
+            display: flex;
+            gap: 5px;
+            flex-grow: 1;
+        }
+        .selection-button-wrapper {
+            position: relative;
+        }
+        .selection-button {
+            background: #007bff;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 12px;
+            padding: 5px;
+        }
+        .selection-button:hover {
+            background: #0056b3;
+        }
+        .event-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .add-event-button, .remove-event-button {
+            background: #28a745;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .add-event-button:hover {
+            background: #218838;
+        }
+        .remove-event-button {
+            background: #dc3545;
+        }
+        .remove-event-button:hover {
+            background: #c82333;
+        }
+        .gpio-select, .condition-select, .relay-select {
+            position: absolute;
+            display: none;
+            top: 100%;
+            left: 0;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            padding: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .gpio-select button, .condition-select button, .relay-select button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 5px;
+            background: none;
+            border: none;
+            color: #333;
+            cursor: pointer;
+        }
+        .gpio-select button:hover, .condition-select button:hover, .relay-select button:hover {
+            background: #f1f1f1;
         }
     </style>
 </head>
@@ -68,34 +155,32 @@
             <p><strong>Device Address:</strong> <span id="device-address">192.168.1.100</span></p>
             <p><strong>Sending Data:</strong> <span id="device-data">Temperature: 23°C, Humidity: 45%</span></p>
         </div>
-        <div class="selection-container" style="margin-bottom: 20px;">
-            <label for="device-type"><strong>Device Type:</strong></label>
-            <select id="device-type" name="device-type" style="margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #e0e0e0; width: 100%;">
-                <option value="sensor">1. Sensor</option>
-                <option value="control">2. Control Device</option>
-            </select>
-        </div>
-        <div class="init-container" style="margin-bottom: 20px;">
-            <label for="device-init"><strong>Initialization Type:</strong></label>
-            <select id="device-init" name="device-init" style="margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #e0e0e0; width: 100%;">
-                <option value="on-off-switch">1. On/Off Switch</option>
-                <option value="rgb-led">2. RGB LED</option>
-                <option value="on-off-socket">3. On/Off Socket</option>
-                <option value="curtain">4. Curtain</option>
-            </select>
-        </div>
-        <div class="trigger-container" style="margin-bottom: 20px;">
-            <label for="trigger-type"><strong>Trigger Type:</strong></label>
-            <select id="trigger-type" name="trigger-type" style="margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #e0e0e0; width: 100%;">
-                <option value="if-on-then-off">1. If ON, then OFF</option>
-                <option value="if-off-then-on">2. If OFF, then ON</option>
-                <option value="if-temp-above">3. If Temperature above threshold, turn ON</option>
-                <option value="if-temp-below">4. If Temperature below threshold, turn OFF</option>
-            </select>
-        </div>
-        <div class="name-container" style="margin-bottom: 20px;">
+        <div class="name-container" style="margin-bottom: 15px;">
             <label for="device-name"><strong>Device Name:</strong></label>
-            <input type="text" id="device-name" name="device-name" placeholder="Enter device name" style="margin-left: 10px; padding: 10px; border-radius: 10px; border: 1px solid #e0e0e0; width: calc(100% - 30px);">
+            <input type="text" id="device-name" name="device-name" placeholder="Enter device name" style="margin-left: 10px; padding: 6px; border-radius: 5px; border: 1px solid #e0e0e0; width: calc(100% - 30px);">
+        </div>
+        <div class="event-container" id="event-container">
+            <div class="event-count">
+                <input type="text" class="event-label-input" placeholder="Event Name">
+                <div class="selection-buttons">
+                    <div class="selection-button-wrapper">
+                        <button class="selection-button" onclick="toggleGpioSelect(this)">GPIO</button>
+                        <div class="gpio-select"></div>
+                    </div>
+                    <div class="selection-button-wrapper">
+                        <button class="selection-button" onclick="toggleConditionSelect(this)">Condition</button>
+                        <div class="condition-select"></div>
+                    </div>
+                    <div class="selection-button-wrapper">
+                        <button class="selection-button" onclick="toggleRelaySelect(this)">Relay</button>
+                        <div class="relay-select"></div>
+                    </div>
+                </div>
+                <div class="event-buttons">
+                    <button class="add-event-button" onclick="addNewEventField()">+</button>
+                    <button class="remove-event-button" onclick="removeEventField(this)">-</button>
+                </div>
+            </div>
         </div>
         <div class="button-container">
             <button onclick="window.location.href='zigbeeSetting.html'">Back</button>
@@ -104,7 +189,137 @@
     </div>
 
     <script>
-        // Here you could add logic to dynamically load device data, for now, it is static.
+        function addNewEventField() {
+            const eventContainer = document.getElementById('event-container');
+            const newEventCount = document.createElement('div');
+            newEventCount.classList.add('event-count');
+            newEventCount.innerHTML = `
+                <input type="text" class="event-label-input" placeholder="Event Name">
+                <div class="selection-buttons">
+                    <div class="selection-button-wrapper">
+                        <button class="selection-button" onclick="toggleGpioSelect(this)">GPIO</button>
+                        <div class="gpio-select"></div>
+                    </div>
+                    <div class="selection-button-wrapper">
+                        <button class="selection-button" onclick="toggleConditionSelect(this)">Condition</button>
+                        <div class="condition-select"></div>
+                    </div>
+                    <div class="selection-button-wrapper">
+                        <button class="selection-button" onclick="toggleRelaySelect(this)">Relay</button>
+                        <div class="relay-select"></div>
+                    </div>
+                </div>
+                <div class="event-buttons">
+                    <button class="add-event-button" onclick="addNewEventField()">+</button>
+                    <button class="remove-event-button" onclick="removeEventField(this)">-</button>
+                </div>
+            `;
+            eventContainer.appendChild(newEventCount);
+            updateRemoveButtons();
+        }
+
+        function removeEventField(button) {
+            const eventContainer = document.getElementById('event-container');
+            if (eventContainer.children.length > 1) {
+                eventContainer.removeChild(button.closest('.event-count'));
+            }
+            updateRemoveButtons();
+        }
+
+        function toggleGpioSelect(button) {
+            const gpioSelect = button.nextElementSibling;
+            if (!gpioSelect) return;
+            if (!gpioSelect.dataset.generated) {
+                for (let i = 1; i <= 16; i++) {
+                    const gpioButton = document.createElement('button');
+                    gpioButton.innerText = `GPIO ${i}`;
+                    gpioButton.onclick = function() {
+                        selectGpio(button, `GPIO ${i}`);
+                    };
+                    gpioSelect.appendChild(gpioButton);
+                }
+                gpioSelect.dataset.generated = 'true';
+            }
+            closeAllSelects();
+            gpioSelect.style.display = gpioSelect.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function selectGpio(button, gpio) {
+            button.innerText = gpio;
+            const gpioSelect = button.nextElementSibling;
+            gpioSelect.style.display = 'none';
+        }
+
+        function toggleConditionSelect(button) {
+            const conditionSelect = button.nextElementSibling;
+            if (!conditionSelect) return;
+            if (!conditionSelect.dataset.generated) {
+                const conditions = ['On/Off Click', 'Off/On Click'];
+                conditions.forEach(condition => {
+                    const conditionButton = document.createElement('button');
+                    conditionButton.innerText = condition;
+                    conditionButton.onclick = function() {
+                        selectCondition(button, condition);
+                    };
+                    conditionSelect.appendChild(conditionButton);
+                });
+                conditionSelect.dataset.generated = 'true';
+            }
+            closeAllSelects();
+            conditionSelect.style.display = conditionSelect.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function selectCondition(button, condition) {
+            button.innerText = condition;
+            const conditionSelect = button.nextElementSibling;
+            conditionSelect.style.display = 'none';
+        }
+
+        function toggleRelaySelect(button) {
+            const relaySelect = button.nextElementSibling;
+            if (!relaySelect) return;
+            if (!relaySelect.dataset.generated) {
+                for (let i = 1; i <= 16; i++) {
+                    const relayButton = document.createElement('button');
+                    relayButton.innerText = `Relay ${i}`;
+                    relayButton.onclick = function() {
+                        selectRelay(button, `Relay ${i}`);
+                    };
+                    relaySelect.appendChild(relayButton);
+                }
+                relaySelect.dataset.generated = 'true';
+            }
+            closeAllSelects();
+            relaySelect.style.display = relaySelect.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function selectRelay(button, relay) {
+            button.innerText = relay;
+            const relaySelect = button.nextElementSibling;
+            relaySelect.style.display = 'none';
+        }
+
+        function updateRemoveButtons() {
+            const eventContainer = document.getElementById('event-container');
+            const removeButtons = eventContainer.querySelectorAll('.remove-event-button');
+            removeButtons.forEach(button => {
+                button.disabled = eventContainer.children.length === 1;
+            });
+        }
+
+        function closeAllSelects() {
+            document.querySelectorAll('.gpio-select, .condition-select, .relay-select').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.matches('.selection-button')) {
+                closeAllSelects();
+            }
+        });
+
+        updateRemoveButtons();
     </script>
 </body>
 </html>
